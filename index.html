@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ИБ Инциденты — Жалағаш Ауданы Әкімдігі</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="shield-icon">🛡</div>
+      <div>
+        <div class="header-title">АҚПАРАТТЫҚ ҚАУІПСІЗДІК</div>
+        <div class="header-sub">Жалағаш ауданы әкімдігі · Инциденттерді тіркеу жүйесі</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-clock" id="clock"></div>
+      <div class="header-date" id="dateDisplay"></div>
+    </div>
+  </header>
+
+  <!-- STATS BAR -->
+  <section class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-num" id="statTotal">0</div>
+      <div class="stat-label">Барлығы / Всего</div>
+    </div>
+    <div class="stat-card accent-new">
+      <div class="stat-num" id="statNew">0</div>
+      <div class="stat-label">Жаңа / Новый</div>
+    </div>
+    <div class="stat-card accent-progress">
+      <div class="stat-num" id="statProgress">0</div>
+      <div class="stat-label">Жұмыста / В работе</div>
+    </div>
+    <div class="stat-card accent-done">
+      <div class="stat-num" id="statDone">0</div>
+      <div class="stat-label">Шешілді / Решён</div>
+    </div>
+  </section>
+
+  <main>
+    <!-- FORM -->
+    <section class="form-section">
+      <div class="section-label">// ИНЦИДЕНТ ТІРКЕУ</div>
+      <h2 class="section-title">Жаңа инцидент қосу</h2>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Инцидент түрі / Тип инцидента</label>
+          <select id="incidentType">
+            <option value="">— Таңдаңыз —</option>
+            <option value="Вирус / Зловредное ПО">🦠 Вирус / Зловредное ПО</option>
+            <option value="Фишинг">🎣 Фишинг</option>
+            <option value="Несанкционированный доступ">🔓 Несанкционированный доступ</option>
+            <option value="Утечка данных">📤 Утечка данных</option>
+            <option value="DDoS атака">💥 DDoS атака</option>
+            <option value="Потеря устройства">📱 Потеря устройства</option>
+            <option value="Другое">❓ Другое</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Бөлім / Отдел</label>
+          <input type="text" id="department" placeholder="Мысалы: Экономика бөлімі"/>
+        </div>
+
+        <div class="form-group">
+          <label>Байқалған күн / Дата обнаружения</label>
+          <input type="date" id="incidentDate"/>
+        </div>
+
+        <div class="form-group">
+          <label>Маңыздылық / Приоритет</label>
+          <select id="priority">
+            <option value="Жоғары / Высокий">🔴 Жоғары / Высокий</option>
+            <option value="Орташа / Средний" selected>🟡 Орташа / Средний</option>
+            <option value="Төмен / Низкий">🟢 Төмен / Низкий</option>
+          </select>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Сипаттама / Описание</label>
+          <textarea id="description" rows="3" placeholder="Не болды? Қысқаша сипаттаңыз..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Тіркеген / Зарегистрировал</label>
+          <input type="text" id="reportedBy" placeholder="Аты-жөні / ФИО"/>
+        </div>
+
+        <div class="form-group btn-group">
+          <button class="btn-submit" onclick="addIncident()">＋ Тіркеу / Добавить</button>
+          <button class="btn-clear" onclick="clearForm()">✕ Тазалау</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABLE SECTION -->
+    <section class="table-section">
+      <div class="table-header-row">
+        <div>
+          <div class="section-label">// ИНЦИДЕНТТЕР ТІЗІМІ</div>
+          <h2 class="section-title">Барлық инциденттер</h2>
+        </div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="filterIncidents('all', this)">Барлығы</button>
+          <button class="filter-btn" onclick="filterIncidents('Жаңа / Новый', this)">Жаңа</button>
+          <button class="filter-btn" onclick="filterIncidents('Жұмыста / В работе', this)">Жұмыста</button>
+          <button class="filter-btn" onclick="filterIncidents('Шешілді / Решён', this)">Шешілді</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="incidentTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Күні / Дата</th>
+              <th>Түрі / Тип</th>
+              <th>Бөлім / Отдел</th>
+              <th>Маңыздылық</th>
+              <th>Статус</th>
+              <th>Тіркеген</th>
+              <th>Әрекет</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr class="empty-row">
+              <td colspan="8">Инциденттер жоқ. Жоғарыдан қосыңыз ↑</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>Жалағаш ауданы әкімдігі · Ақпараттық қауіпсіздік бөлімі</div>
+    <div>Қорқыт Ата атындағы Қызылорда университеті · Тәжірибе жобасы 2025</div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
